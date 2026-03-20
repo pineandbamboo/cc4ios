@@ -44,4 +44,49 @@
 - `extract_content.mjs` - Article extraction script
 - `capture_sections.mjs` - Image download script
 
-**Commit ID:** (to be added after first commit)
+**Commit ID:** 811b49a
+
+---
+
+## [2026-03-21] Phase 0 & Phase 1 Implementation
+
+### What was done
+- Initialized Next.js 15 project with TypeScript and Tailwind CSS
+- Created project directory structure (src/app, components, lib)
+- Set up dev-tasks.json for Ralph loop task queue
+- Implemented VoiceInput component with Web Speech API
+- Implemented DocumentList component
+- Created database schema (SQLite) for documents,- Implemented AI provider abstraction (Claude + OpenAI)
+- Added API routes:
+  - /api/documents (CRUD)
+  - /api/ai/edit, /api/ai/translate
+  - /api/ai/grammar-check, /api/ai/logic-check, /api/ai/mindmap
+  - /api/voice/transcribe (Whisper)
+- Added typography formatting utilities
+- Created DocumentEditor component with AI editing
+- Created TranslationEditor component with sync scroll
+- Created MindMapView component
+- Created AIEditPanel component with diff preview
+- Added unit tests for typography and VoiceInput
+
+### Key Patterns
+1. **AI Provider Factory Pattern**
+   - Use factory function to switch between Claude and OpenAI
+   - Interface-based abstraction for extensibility
+
+2. **Offline-first Design**
+   - Local SQLite database with cloud sync option
+   - Voice input with browser-native Web Speech API + Whisper fallback
+
+3. **Component Architecture**
+   - Separated concerns: Editor, AI Panel, Translation, Mind Map
+   - Each component handles its own state and API calls
+
+### Next Steps
+1. Install npm dependencies and verify build
+2. Create E2E tests with Playwright
+3. Add more AI editing features
+4. Implement iCloud sync
+5. Build Mac desktop app (SwiftUI or Electron)
+
+**Commit ID:** a2c60ef
