@@ -90,3 +90,32 @@
 5. Build Mac desktop app (SwiftUI or Electron)
 
 **Commit ID:** a2c60ef
+
+---
+
+## [2026-03-21] Build Fixes & E2E Tests
+
+### What was done
+- Fixed build errors:
+  - Added Web Speech API type declarations
+  - Fixed circular import in AI provider
+  - Inlined database schema to avoid runtime file reads
+  - Fixed Buffer to Blob conversion for OpenAI Whisper
+- Installed all npm dependencies
+- Verified production build succeeds
+- Added Playwright E2E tests:
+  - App navigation and tab switching
+  - Voice input component
+  - PWA manifest verification
+  - API route tests for documents and AI
+
+### Commits
+- `78299c8` - Add document editor, translation, mind map components
+- `ab198e6` - Fix build errors and add missing type definitions
+- `ff8ec9e` - Add Playwright E2E tests for app and API
+
+### Remaining Tasks
+1. Add remaining UI components (GrammarChecker, LogicChecker, ExportButton)
+2. Set up Vercel deployment
+3. Add service worker for PWA offline support
+4. Create Mac desktop app wrapper (Electron or SwiftUI)
