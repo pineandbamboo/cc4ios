@@ -1,0 +1,85 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "status": "in_progress",
+      "priority": "high",
+      "title": "Initialize Next.js project",
+      "description": "Initialize Next.js 15 with TypeScript, Tailwind CSS, and shadcn/ui",
+      "created_at": "2026-03-21T00:00:00Z",
+      "assigned_to": "claude-code-worker-1"
+    },
+    {
+      "id": "task-002",
+      "status": "pending",
+      "priority": "high",
+      "title": "Set up database schema",
+      "description": "Create SQLite schema for documents, voice_memos, translations tables",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-001"]
+    },
+    {
+      "id": "task-003",
+      "status": "pending",
+      "priority": "high",
+      "title": "Create voice input component",
+      "description": "Build voice recording component with Web Speech API integration",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-001"]
+    },
+    {
+      "id": "task-004",
+      "status": "pending",
+      "priority": "medium",
+      "title": "Create document editor",
+      "description": "Build markdown editor with live preview",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-001", "task-002"]
+    },
+    {
+      "id": "task-005",
+      "status": "pending",
+      "priority": "medium",
+      "title": "Set up PWA configuration",
+      "description": "Create manifest.json and service worker for PWA",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-001"]
+    },
+    {
+      "id": "task-006",
+      "status": "pending",
+      "priority": "medium",
+      "title": "Create AI service abstraction",
+      "description": "Build AI provider interface for Claude and OpenAI",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-001"]
+    },
+    {
+      "id": "task-007",
+      "status": "pending",
+      "priority": "low",
+      "title": "Create typography formatter",
+      "description": "Implement Chinese/English/number spacing rules",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-001"]
+    },
+    {
+      "id": "task-008",
+      "status": "pending",
+      "priority": "low",
+      "title": "Create translation editor",
+      "description": "Build side-by-side bilingual editor",
+      "created_at": "2026-03-21T00:00:00Z",
+      "dependencies": ["task-004", "task-006"]
+    }
+  ],
+  "metadata": {
+    "project": "CEO Support App",
+    "version": "0.1.0",
+    "last_updated": "2026-03-21T00:00:00Z",
+    "total_tasks": 8,
+    "completed": 0,
+    "in_progress": 1,
+    "pending": 7
+  }
+}
