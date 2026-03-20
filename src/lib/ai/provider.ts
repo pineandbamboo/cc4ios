@@ -1,4 +1,4 @@
-import type { AIProvider } from "./provider";
+import type { AIProvider } from "./types";
 import { ClaudeProvider } from "./claude-client";
 import { OpenAIProvider } from "./openai-client";
 
@@ -13,4 +13,4 @@ export function getAIProvider(provider: "claude" | "openai" = "claude"): AIProvi
   }
 }
 
-export type { AIProvider, GrammarCheckResult, LogicCheckResult, MindMapStructure } from "./provider";
+export type { AIProvider, GrammarCheckResult, LogicCheckResult, MindMapStructure } from "./types";

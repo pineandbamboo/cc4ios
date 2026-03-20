@@ -4,7 +4,7 @@
  */
 
 import OpenAI from "openai";
-import type { AIProvider, GrammarCheckResult, LogicCheckResult, MindMapStructure } from "./provider";
+import type { AIProvider, GrammarCheckResult, LogicCheckResult, MindMapStructure } from "./types";
 
 export class OpenAIProvider implements AIProvider {
   private client: OpenAI;
@@ -130,8 +130,13 @@ Document: ${content}`,
 
   // Whisper transcription method
   async transcribe(audioBuffer: Buffer): Promise<string> {
+    // Convert Buffer to Uint8Array for File constructor
+    const uint8Array = new Uint8Array(audioBuffer);
+    const blob = new Blob([uint8Array], { type: "audio/webm" });
+    const file = new File([blob], "audio.webm", { type: "audio/webm" });
+
     const response = await this.client.audio.transcriptions.create({
-      file: new File([audioBuffer], "audio.webm", { type: "audio/webm" }),
+      file,
       model: "whisper-1",
       language: "zh",
     });

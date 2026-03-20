@@ -4,7 +4,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import type { AIProvider, GrammarCheckResult, LogicCheckResult, MindMapStructure } from "./provider";
+import type { AIProvider, GrammarCheckResult, LogicCheckResult, MindMapStructure } from "./types";
 
 export class ClaudeProvider implements AIProvider {
   private client: Anthropic;
@@ -83,25 +83,11 @@ Return ONLY the translation, without any explanation.`,
       messages: [
         {
           role: "user",
-          content: `Check the grammar of the following ${langName} text.
-Identify any errors or areas for improvement.
+          content: `Check the grammar of the following ${langName} text. Respond in JSON format with "issues" array containing objects with "text", "suggestion", "explanation", and "severity" fields (severity: "error" | "warning" | "suggestion").
 
-Text:
-${content}
+Text: ${content}
 
-Respond in JSON format:
-{
-  "issues": [
-    {
-      "text": "the problematic text",
-      "suggestion": "suggested correction",
-      "explanation": "why this is an issue",
-      "severity": "error" | "warning" | "suggestion"
-    }
-  ]
-}
-
-If no issues found, return {"issues": []}`,
+Return only valid JSON.`,
         },
       ],
     });
@@ -114,7 +100,7 @@ If no issues found, return {"issues": []}`,
         return { issues: [] };
       }
     }
-    throw new Error("Unexpected response type from Claude");
+    return { issues: [] };
   }
 
   async checkLogic(content: string): Promise<LogicCheckResult> {
@@ -124,29 +110,11 @@ If no issues found, return {"issues": []}`,
       messages: [
         {
           role: "user",
-          content: `Analyze the logical structure and clarity of the following document.
-Check for:
-- Contradictions
-- Ambiguous statements
-- Incomplete arguments
-- Weak reasoning
+          content: `Analyze the logical structure of this document. Respond in JSON format with "issues" array containing objects with "text", "issue", "suggestion", and "type" fields (type: "contradiction" | "ambiguity" | "incomplete" | "weak-argument").
 
-Document:
-${content}
+Document: ${content}
 
-Respond in JSON format:
-{
-  "issues": [
-    {
-      "text": "the problematic text",
-      "issue": "description of the issue",
-      "suggestion": "how to improve",
-      "type": "contradiction" | "ambiguity" | "incomplete" | "weak-argument"
-    }
-  ]
-}
-
-If no issues found, return {"issues": []}`,
+Return only valid JSON.`,
         },
       ],
     });
@@ -159,7 +127,7 @@ If no issues found, return {"issues": []}`,
         return { issues: [] };
       }
     }
-    throw new Error("Unexpected response type from Claude");
+    return { issues: [] };
   }
 
   async generateMindMap(content: string): Promise<MindMapStructure> {
@@ -169,25 +137,11 @@ If no issues found, return {"issues": []}`,
       messages: [
         {
           role: "user",
-          content: `Generate a mind map structure from the following document.
-Extract the main topics and subtopics.
+          content: `Generate a mind map structure from this document. Respond in JSON format with "title" string and "children" array of nodes with "id", "text", and optional "children" fields.
 
-Document:
-${content}
+Document: ${content}
 
-Respond in JSON format:
-{
-  "title": "Main title",
-  "children": [
-    {
-      "id": "unique-id-1",
-      "text": "Topic 1",
-      "children": [
-        {"id": "unique-id-1-1", "text": "Subtopic 1.1"}
-      ]
-    }
-  ]
-}`,
+Return only valid JSON.`,
         },
       ],
     });
@@ -200,7 +154,7 @@ Respond in JSON format:
         return { title: "Document", children: [] };
       }
     }
-    throw new Error("Unexpected response type from Claude");
+    return { title: "Document", children: [] };
   }
 }
 
