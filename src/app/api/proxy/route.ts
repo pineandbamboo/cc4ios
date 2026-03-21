@@ -5,7 +5,7 @@ import db from "@/lib/db";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { connectionId, endpoint, method = "GET", data } = body;
+    const { connectionId, endpoint, method = "GET", data, body: requestBody } = body;
 
     if (!connectionId || !endpoint) {
       return NextResponse.json(
@@ -35,11 +35,14 @@ export async function POST(request: NextRequest) {
       headers["Authorization"] = `Bearer ${connection.auth_token}`;
     }
 
+    // Use either data or requestBody (support both formats)
+    const payload = data || requestBody;
+
     // Forward request
     const response = await fetch(targetUrl, {
       method,
       headers,
-      body: method !== "GET" && data ? JSON.stringify(data) : undefined,
+      body: method !== "GET" && payload ? JSON.stringify(payload) : undefined,
     });
 
     // Update connection status

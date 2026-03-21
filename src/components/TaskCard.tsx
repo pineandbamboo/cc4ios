@@ -20,34 +20,34 @@ interface TaskCardProps {
 const statusConfig = {
   in_progress: {
     label: "进行中",
-    bgColor: "bg-blue-500/20",
-    textColor: "text-blue-400",
-    borderColor: "border-blue-500",
+    bgColor: "rgba(59, 130, 246, 0.15)",
+    textColor: "#60a5fa",
+    borderColor: "#3b82f6",
   },
   completed: {
     label: "已完成",
-    bgColor: "bg-green-500/20",
-    textColor: "text-green-400",
-    borderColor: "border-green-500",
+    bgColor: "rgba(34, 197, 94, 0.15)",
+    textColor: "#4ade80",
+    borderColor: "#22c55e",
   },
   archived: {
     label: "已归档",
-    bgColor: "bg-gray-500/20",
-    textColor: "text-gray-400",
-    borderColor: "border-gray-500",
+    bgColor: "rgba(107, 114, 128, 0.15)",
+    textColor: "#9ca3af",
+    borderColor: "#6b7280",
   },
 };
 
 const priorityConfig = {
   P1: {
     label: "P1",
-    bgColor: "bg-red-500",
-    textColor: "text-white",
+    bgColor: "#ef4444",
+    textColor: "#ffffff",
   },
   P2: {
     label: "P2",
-    bgColor: "bg-yellow-500",
-    textColor: "text-black",
+    bgColor: "#eab308",
+    textColor: "#000000",
   },
 };
 
@@ -68,27 +68,42 @@ export default function TaskCard({ task, onStatusChange, onClick }: TaskCardProp
 
   return (
     <div
-      className={`p-4 rounded-lg border ${status.borderColor} ${status.bgColor} cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]`}
+      className="p-4 rounded-lg cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+      style={{
+        border: `1px solid ${status.borderColor}`,
+        backgroundColor: status.bgColor,
+      }}
       onClick={() => onClick?.(task.id)}
     >
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-medium text-white flex-1 pr-2">{task.title}</h3>
+        <h3 className="font-medium flex-1 pr-2" style={{ color: 'var(--foreground)' }}>
+          {task.title}
+        </h3>
         <span
-          className={`px-2 py-0.5 rounded text-xs font-bold ${priority.bgColor} ${priority.textColor}`}
+          className="px-2 py-0.5 rounded text-xs font-bold"
+          style={{
+            backgroundColor: priority.bgColor,
+            color: priority.textColor,
+          }}
         >
           {priority.label}
         </span>
       </div>
-      <p className="text-sm text-gray-400 mb-3 line-clamp-2">{task.description}</p>
+      <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--muted)' }}>
+        {task.description}
+      </p>
       <div className="flex items-center justify-between">
-        <span className={`text-xs font-medium ${status.textColor}`}>{status.label}</span>
+        <span className="text-xs font-medium" style={{ color: status.textColor }}>
+          {status.label}
+        </span>
         {onStatusChange && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleNextStatus();
             }}
-            className="text-xs text-gray-500 hover:text-white transition-colors"
+            className="text-xs transition-colors"
+            style={{ color: 'var(--muted-alt)' }}
           >
             下一步 →
           </button>

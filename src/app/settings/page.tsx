@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface ServerConnection {
   id: string;
@@ -13,6 +14,7 @@ interface ServerConnection {
 }
 
 export default function SettingsPage() {
+  const { theme, toggleTheme } = useTheme();
   const [connections, setConnections] = useState<ServerConnection[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -114,16 +116,55 @@ export default function SettingsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white pb-20">
-      <div className="sticky top-0 bg-black/95 backdrop-blur-lg z-30 px-4 py-4 border-b border-gray-800">
+    <main className="min-h-screen pb-20" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
+      <div
+        className="sticky top-0 backdrop-blur-lg z-30 px-4 py-4"
+        style={{
+          backgroundColor: 'var(--nav-bg)',
+          borderBottom: '1px solid var(--nav-border)'
+        }}
+      >
         <h1 className="text-xl font-bold">设置</h1>
       </div>
 
       <div className="p-4 space-y-6">
+        {/* Theme Settings */}
+        <section>
+          <h2 className="text-sm font-medium mb-4" style={{ color: 'var(--muted)' }}>
+            外观设置
+          </h2>
+          <div
+            className="rounded-lg p-4"
+            style={{
+              backgroundColor: 'var(--card-bg)',
+              border: '1px solid var(--card-border)'
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">主题模式</div>
+                <div className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
+                  切换浅色/深色主题
+                </div>
+              </div>
+              <button
+                onClick={toggleTheme}
+                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: theme === 'light' ? 'var(--card-bg-alt)' : '#3b82f6',
+                  color: theme === 'light' ? 'var(--foreground)' : '#ffffff'
+                }}
+              >
+                {theme === 'light' ? '浅色' : '深色'}
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* Server Connections */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-medium text-gray-400">
+            <h2 className="text-sm font-medium" style={{ color: 'var(--muted)' }}>
               Claude Code 实例连接
             </h2>
             <button
@@ -139,7 +180,11 @@ export default function SettingsPage() {
             {connections.map((conn) => (
               <div
                 key={conn.id}
-                className="bg-gray-900 rounded-lg p-4 border border-gray-800"
+                className="rounded-lg p-4"
+                style={{
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--card-border)'
+                }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -148,29 +193,36 @@ export default function SettingsPage() {
                     />
                     <span className="font-medium">{conn.name}</span>
                   </div>
-                  <span className="text-xs text-gray-500">{conn.status}</span>
+                  <span className="text-xs" style={{ color: 'var(--muted)' }}>{conn.status}</span>
                 </div>
-                <p className="text-sm text-gray-400 truncate mb-3">{conn.url}</p>
+                <p className="text-sm truncate mb-3" style={{ color: 'var(--muted)' }}>{conn.url}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleTestConnection(conn)}
                     disabled={testing === conn.id}
-                    className="flex-1 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex-1 py-2 text-sm rounded-lg transition-colors disabled:opacity-50"
+                    style={{
+                      backgroundColor: 'var(--card-bg-alt)',
+                      color: 'var(--foreground)'
+                    }}
                   >
                     {testing === conn.id ? "测试中..." : "测试连接"}
                   </button>
                   <button
                     onClick={() => handleDeleteConnection(conn.id)}
-                    className="px-4 py-2 text-sm bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg transition-colors"
+                    className="px-4 py-2 text-sm rounded-lg transition-colors"
+                    style={{
+                      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                      color: '#f87171'
+                    }}
                   >
                     删除
                   </button>
                 </div>
                 {testResult?.id === conn.id && (
                   <p
-                    className={`mt-2 text-sm ${
-                      testResult.success ? "text-green-400" : "text-red-400"
-                    }`}
+                    className="mt-2 text-sm"
+                    style={{ color: testResult.success ? '#4ade80' : '#f87171' }}
                   >
                     {testResult.message}
                   </p>
@@ -183,10 +235,14 @@ export default function SettingsPage() {
           {showAddForm && (
             <form
               onSubmit={handleAddConnection}
-              className="mt-4 bg-gray-900 rounded-lg p-4 border border-gray-700 space-y-4"
+              className="mt-4 rounded-lg p-4 space-y-4"
+              style={{
+                backgroundColor: 'var(--card-bg)',
+                border: '1px solid var(--input-border)'
+              }}
             >
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm mb-1" style={{ color: 'var(--muted)' }}>
                   连接名称
                 </label>
                 <input
@@ -196,12 +252,17 @@ export default function SettingsPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="例如: Mac Studio, EC2 Server"
-                  className="w-full bg-gray-800 rounded-lg px-3 py-2 text-white placeholder-gray-500"
+                  className="w-full rounded-lg px-3 py-2"
+                  style={{
+                    backgroundColor: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--foreground)'
+                  }}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm mb-1" style={{ color: 'var(--muted)' }}>
                   服务器地址
                 </label>
                 <input
@@ -211,12 +272,17 @@ export default function SettingsPage() {
                     setFormData({ ...formData, url: e.target.value })
                   }
                   placeholder="https://your-server.ngrok.io"
-                  className="w-full bg-gray-800 rounded-lg px-3 py-2 text-white placeholder-gray-500"
+                  className="w-full rounded-lg px-3 py-2"
+                  style={{
+                    backgroundColor: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--foreground)'
+                  }}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm mb-1" style={{ color: 'var(--muted)' }}>
                   认证令牌 (可选)
                 </label>
                 <input
@@ -226,20 +292,29 @@ export default function SettingsPage() {
                     setFormData({ ...formData, auth_token: e.target.value })
                   }
                   placeholder="Bearer token"
-                  className="w-full bg-gray-800 rounded-lg px-3 py-2 text-white placeholder-gray-500"
+                  className="w-full rounded-lg px-3 py-2"
+                  style={{
+                    backgroundColor: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--foreground)'
+                  }}
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors"
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors text-white"
                 >
                   保存
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                  className="px-4 py-2 rounded-lg transition-colors"
+                  style={{
+                    backgroundColor: 'var(--card-bg-alt)',
+                    color: 'var(--foreground)'
+                  }}
                 >
                   取消
                 </button>
@@ -248,11 +323,11 @@ export default function SettingsPage() {
           )}
 
           {loading && (
-            <div className="text-center py-4 text-gray-500">加载中...</div>
+            <div className="text-center py-4" style={{ color: 'var(--muted)' }}>加载中...</div>
           )}
 
           {!loading && connections.length === 0 && !showAddForm && (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8" style={{ color: 'var(--muted)' }}>
               <p className="text-4xl mb-4">🔗</p>
               <p>暂无服务器连接</p>
               <p className="text-sm mt-2">添加你的 Claude Code 实例连接</p>
@@ -261,9 +336,9 @@ export default function SettingsPage() {
         </section>
 
         {/* App Info */}
-        <section className="border-t border-gray-800 pt-6">
-          <h2 className="text-sm font-medium text-gray-400 mb-4">关于</h2>
-          <div className="space-y-2 text-sm text-gray-500">
+        <section className="pt-6" style={{ borderTop: '1px solid var(--card-border)' }}>
+          <h2 className="text-sm font-medium mb-4" style={{ color: 'var(--muted)' }}>关于</h2>
+          <div className="space-y-2 text-sm" style={{ color: 'var(--muted-alt)' }}>
             <p>CEO Support App v1.0.0</p>
             <p>用于管理 Claude Code 实例任务的移动端界面</p>
           </div>

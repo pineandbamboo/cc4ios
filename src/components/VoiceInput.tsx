@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface VoiceInputProps {
   onTranscript?: (text: string) => void;
@@ -9,7 +9,16 @@ interface VoiceInputProps {
 export default function VoiceInput({ onTranscript }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const [isSupported, setIsSupported] = useState(true);
+  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+
+  // Check for Web Speech API support on mount
+  useEffect(() => {
+    const SpeechRecognition =
+      typeof window !== "undefined"
+        ? window.SpeechRecognition || window.webkitSpeechRecognition
+        : undefined;
+    setIsSupported(!!SpeechRecognition);
+  }, []);
 
   const startRecording = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -67,11 +76,19 @@ export default function VoiceInput({ onTranscript }: VoiceInputProps) {
     setTranscript("");
   }, []);
 
+  // Show loading state while checking support
+  if (isSupported === null) {
+    return (
+      <div className="p-4">
+        <p className="text-gray-400">检查语音识别支持...</p>
+      </div>
+    );
+  }
+
   if (!isSupported) {
     return (
       <div className="p-4 bg-yellow-900/20 rounded-lg border border-yellow-800">
-        <p className="text-yellow-400">⚠️ 语音识别在此浏览器中不受支持</p>
-        <p className="text-sm text-gray-400 mt-2">请使用 Chrome 或 Safari 浏览器</p>
+        <p className="text-yellow-400">您的浏览器不支持语音识别。请使用 Chrome、Edge 或 Safari 浏览器。</p>
       </div>
     );
   }

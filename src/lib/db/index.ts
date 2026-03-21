@@ -204,4 +204,81 @@ const crypto = {
   },
 };
 
+// Server Connection operations
+export interface ServerConnection {
+  id: string;
+  name: string;
+  url: string;
+  auth_token: string | null;
+  status: "connected" | "disconnected" | "error";
+  last_ping: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export function getConnection(id: string): ServerConnection | null {
+  const stmt = db.prepare("SELECT * FROM server_connections WHERE id = ?");
+  return stmt.get(id) as ServerConnection | null;
+}
+
+export function getAllConnections(): ServerConnection[] {
+  const stmt = db.prepare("SELECT * FROM server_connections ORDER BY created_at DESC");
+  return stmt.all() as ServerConnection[];
+}
+
+export function createConnection(
+  name: string,
+  url: string,
+  authToken?: string
+): ServerConnection {
+  const id = crypto.randomUUID();
+  const stmt = db.prepare(`
+    INSERT INTO server_connections (id, name, url, auth_token)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(id, name, url, authToken || null);
+  return getConnection(id)!;
+}
+
+export function updateConnection(
+  id: string,
+  updates: Partial<Pick<ServerConnection, "name" | "url" | "auth_token" | "status">>
+): ServerConnection | null {
+  const fields: string[] = [];
+  const values: (string | null)[] = [];
+
+  if (updates.name !== undefined) {
+    fields.push("name = ?");
+    values.push(updates.name);
+  }
+  if (updates.url !== undefined) {
+    fields.push("url = ?");
+    values.push(updates.url);
+  }
+  if (updates.auth_token !== undefined) {
+    fields.push("auth_token = ?");
+    values.push(updates.auth_token);
+  }
+  if (updates.status !== undefined) {
+    fields.push("status = ?");
+    values.push(updates.status);
+  }
+
+  if (fields.length === 0) return getConnection(id);
+
+  values.push(id);
+  const stmt = db.prepare(`
+    UPDATE server_connections SET ${fields.join(", ")}, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `);
+  stmt.run(...values);
+  return getConnection(id);
+}
+
+export function deleteConnection(id: string): boolean {
+  const stmt = db.prepare("DELETE FROM server_connections WHERE id = ?");
+  const result = stmt.run(id);
+  return result.changes > 0;
+}
+
 export default db;

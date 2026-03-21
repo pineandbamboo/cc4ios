@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "./ThemeProvider";
 
 interface Tab {
   id: string;
@@ -20,6 +21,7 @@ const tabs: Tab[] = [
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme } = useTheme();
 
   const isActive = (path: string) => {
     if (path === "/documents" && pathname === "/") return true;
@@ -27,15 +29,24 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-gray-800 z-50">
+    <nav
+      className="fixed bottom-0 left-0 right-0 backdrop-blur-lg z-50"
+      style={{
+        backgroundColor: 'var(--nav-bg)',
+        borderTop: '1px solid var(--nav-border)'
+      }}
+    >
       <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => router.push(tab.path)}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
-              isActive(tab.path) ? "text-white" : "text-gray-500"
-            }`}
+            className="flex flex-col items-center justify-center w-full h-full transition-colors"
+            style={{
+              color: isActive(tab.path)
+                ? 'var(--foreground)'
+                : 'var(--muted-alt)'
+            }}
           >
             <span className="text-xl mb-1">{tab.icon}</span>
             <span className="text-xs font-medium">{tab.label}</span>

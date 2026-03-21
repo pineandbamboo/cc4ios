@@ -76,9 +76,26 @@ test.describe("Settings", () => {
     await page.goto("/settings");
 
     // Check settings page content
-    await expect(page.getByRole("heading", { name: "设置" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "设置", exact: true })).toBeVisible();
+    // Check theme toggle exists
+    await expect(page.getByText("主题模式")).toBeVisible();
+    await expect(page.getByRole("button", { name: /浅色|深色/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Claude Code 实例连接" })).toBeVisible();
     await expect(page.getByRole("button", { name: /\+ 添加/ })).toBeVisible();
+  });
+
+  test("should toggle theme", async ({ page }) => {
+    await page.goto("/settings");
+
+    // Check initial theme is light
+    const themeButton = page.getByRole("button", { name: /浅色|深色/ });
+    await expect(themeButton).toBeVisible();
+
+    // Click to toggle theme
+    await themeButton.click();
+
+    // Theme should change
+    await expect(themeButton).toBeVisible();
   });
 
   test("should show add connection form", async ({ page }) => {
@@ -132,5 +149,22 @@ test.describe("Task Management", () => {
 
     // The page should have the recording button
     await expect(page.getByRole("button", { name: /🎤/ }).first()).toBeVisible();
+  });
+});
+
+test.describe("Voice Input", () => {
+  test("should show unsupported message when Web Speech API not available", async ({ page }) => {
+    // Mock Web Speech API as unavailable
+    await page.addInitScript(() => {
+      // @ts-expect-error - mocking
+      window.SpeechRecognition = undefined;
+      // @ts-expect-error - mocking
+      window.webkitSpeechRecognition = undefined;
+    });
+
+    await page.goto("/documents");
+
+    // Should show unsupported message immediately on load
+    await expect(page.getByText(/不支持语音识别/)).toBeVisible();
   });
 });

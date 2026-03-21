@@ -62,14 +62,20 @@ export default function DocumentsPage() {
   const completedTasks = tasks.filter((t) => t.status === "completed");
 
   return (
-    <main className="min-h-screen bg-black text-white pb-20">
+    <main className="min-h-screen pb-20" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
       {/* Header */}
-      <div className="sticky top-0 bg-black/95 backdrop-blur-lg z-30 px-4 py-4 border-b border-gray-800">
+      <div
+        className="sticky top-0 backdrop-blur-lg z-30 px-4 py-4"
+        style={{
+          backgroundColor: 'var(--nav-bg)',
+          borderBottom: '1px solid var(--nav-border)'
+        }}
+      >
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">文档</h1>
           <button
             onClick={() => setShowRecordingBar(true)}
-            className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center"
+            className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
           >
             🎤
           </button>
@@ -81,7 +87,7 @@ export default function DocumentsPage() {
         {/* In Progress Tasks */}
         {inProgressTasks.length > 0 && (
           <section>
-            <h2 className="text-sm font-medium text-gray-400 mb-3">进行中</h2>
+            <h2 className="text-sm font-medium mb-3" style={{ color: 'var(--muted)' }}>进行中</h2>
             <div className="space-y-3">
               {inProgressTasks.map((task) => (
                 <TaskCard
@@ -97,7 +103,7 @@ export default function DocumentsPage() {
         {/* Completed Tasks */}
         {completedTasks.length > 0 && (
           <section>
-            <h2 className="text-sm font-medium text-gray-400 mb-3">已完成</h2>
+            <h2 className="text-sm font-medium mb-3" style={{ color: 'var(--muted)' }}>已完成</h2>
             <div className="space-y-3">
               {completedTasks.map((task) => (
                 <TaskCard
@@ -112,29 +118,23 @@ export default function DocumentsPage() {
 
         {/* Instance Monitor */}
         <section>
-          <h2 className="text-sm font-medium text-gray-400 mb-3">实例监控</h2>
+          <h2 className="text-sm font-medium mb-3" style={{ color: 'var(--muted)' }}>实例监控</h2>
           <InstanceMonitor />
         </section>
 
         {/* Documents List */}
         <section>
-          <h2 className="text-sm font-medium text-gray-400 mb-3">文档列表</h2>
+          <h2 className="text-sm font-medium mb-3" style={{ color: 'var(--muted)' }}>文档列表</h2>
           <DocumentList />
         </section>
 
         {/* Empty state */}
         {loading && (
-          <div className="text-center py-8 text-gray-500">加载中...</div>
+          <div className="text-center py-8" style={{ color: 'var(--muted)' }}>加载中...</div>
         )}
       </div>
 
-      {/* Recording Bar */}
-      <RecordingBar
-        visible={showRecordingBar}
-        onTranscript={handleTranscript}
-      />
-
-      {/* Bottom Navigation */}
+      <RecordingBar visible={showRecordingBar} onTranscript={handleTranscript} />
       <BottomNav />
     </main>
   );

@@ -60,14 +60,20 @@ export default function MeetingsPage() {
   const completedTasks = tasks.filter((t) => t.status === "completed");
 
   return (
-    <main className="min-h-screen bg-black text-white pb-20">
+    <main className="min-h-screen pb-20" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
       {/* Header */}
-      <div className="sticky top-0 bg-black/95 backdrop-blur-lg z-30 px-4 py-4 border-b border-gray-800">
+      <div
+        className="sticky top-0 backdrop-blur-lg z-30 px-4 py-4"
+        style={{
+          backgroundColor: 'var(--nav-bg)',
+          borderBottom: '1px solid var(--nav-border)'
+        }}
+      >
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">会议</h1>
           <button
             onClick={() => setShowRecordingBar(true)}
-            className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center"
+            className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
           >
             🎤
           </button>
@@ -78,7 +84,7 @@ export default function MeetingsPage() {
       <div className="p-4 space-y-6">
         {inProgressTasks.length > 0 && (
           <section>
-            <h2 className="text-sm font-medium text-gray-400 mb-3">进行中</h2>
+            <h2 className="text-sm font-medium mb-3" style={{ color: 'var(--muted)' }}>进行中</h2>
             <div className="space-y-3">
               {inProgressTasks.map((task) => (
                 <TaskCard
@@ -93,7 +99,7 @@ export default function MeetingsPage() {
 
         {completedTasks.length > 0 && (
           <section>
-            <h2 className="text-sm font-medium text-gray-400 mb-3">已完成</h2>
+            <h2 className="text-sm font-medium mb-3" style={{ color: 'var(--muted)' }}>已完成</h2>
             <div className="space-y-3">
               {completedTasks.map((task) => (
                 <TaskCard
@@ -107,7 +113,7 @@ export default function MeetingsPage() {
         )}
 
         {!loading && tasks.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12" style={{ color: 'var(--muted)' }}>
             <p className="text-4xl mb-4">📅</p>
             <p>暂无会议任务</p>
             <p className="text-sm mt-2">点击麦克风添加新任务</p>
@@ -115,7 +121,7 @@ export default function MeetingsPage() {
         )}
 
         {loading && (
-          <div className="text-center py-8 text-gray-500">加载中...</div>
+          <div className="text-center py-8" style={{ color: 'var(--muted)' }}>加载中...</div>
         )}
       </div>
 

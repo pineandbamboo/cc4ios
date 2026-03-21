@@ -12,8 +12,11 @@ export default function Home() {
   }, [router]);
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center">
-      <p className="text-gray-500">Loading...</p>
+    <main
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: 'var(--background)' }}
+    >
+      <p style={{ color: 'var(--muted)' }}>Loading...</p>
     </main>
   );
 }

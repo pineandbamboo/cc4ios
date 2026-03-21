@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import TerminalViewer from "./TerminalViewer";
 
 interface ServerConnection {
   id: string;
@@ -18,6 +19,7 @@ export default function InstanceMonitor({ onRefresh }: InstanceMonitorProps) {
   const [connections, setConnections] = useState<ServerConnection[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTerminal, setActiveTerminal] = useState<ServerConnection | null>(null);
 
   const fetchConnections = async () => {
     try {
@@ -85,11 +87,17 @@ export default function InstanceMonitor({ onRefresh }: InstanceMonitorProps) {
 
   if (loading) {
     return (
-      <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+      <div
+        className="rounded-lg p-4"
+        style={{
+          backgroundColor: 'var(--card-bg)',
+          border: '1px solid var(--card-border)'
+        }}
+      >
         <div className="animate-pulse flex space-x-4">
           <div className="flex-1 space-y-4 py-1">
-            <div className="h-4 bg-gray-700 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+            <div className="h-4 rounded w-3/4" style={{ backgroundColor: 'var(--card-bg-alt)' }}></div>
+            <div className="h-4 rounded w-1/2" style={{ backgroundColor: 'var(--card-bg-alt)' }}></div>
           </div>
         </div>
       </div>
@@ -99,9 +107,15 @@ export default function InstanceMonitor({ onRefresh }: InstanceMonitorProps) {
   return (
     <div className="space-y-4">
       {/* Summary Card */}
-      <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+      <div
+        className="rounded-lg p-4"
+        style={{
+          backgroundColor: 'var(--card-bg)',
+          border: '1px solid var(--card-border)'
+        }}
+      >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-medium text-white">实例状态</h3>
+          <h3 className="font-medium" style={{ color: 'var(--foreground)' }}>实例状态</h3>
           <button
             onClick={pingAll}
             disabled={refreshing}
@@ -112,18 +126,20 @@ export default function InstanceMonitor({ onRefresh }: InstanceMonitorProps) {
         </div>
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-white">{connections.length}</div>
-            <div className="text-xs text-gray-500">总实例</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
+              {connections.length}
+            </div>
+            <div className="text-xs" style={{ color: 'var(--muted)' }}>总实例</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-green-400">{connectedCount}</div>
-            <div className="text-xs text-gray-500">在线</div>
+            <div className="text-xs" style={{ color: 'var(--muted)' }}>在线</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-400">
+            <div className="text-2xl font-bold" style={{ color: 'var(--muted)' }}>
               {connections.length - connectedCount}
             </div>
-            <div className="text-xs text-gray-500">离线</div>
+            <div className="text-xs" style={{ color: 'var(--muted)' }}>离线</div>
           </div>
         </div>
       </div>
@@ -133,31 +149,61 @@ export default function InstanceMonitor({ onRefresh }: InstanceMonitorProps) {
         {connections.map((conn) => (
           <div
             key={conn.id}
-            className="bg-gray-900 rounded-lg p-3 border border-gray-800 flex items-center justify-between"
+            className="rounded-lg p-3 flex items-center justify-between"
+            style={{
+              backgroundColor: 'var(--card-bg)',
+              border: '1px solid var(--card-border)'
+            }}
           >
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${statusColor(conn.status)} animate-pulse`} />
               <div>
-                <div className="font-medium text-white text-sm">{conn.name}</div>
-                <div className="text-xs text-gray-500 truncate max-w-[200px]">
+                <div className="font-medium text-sm" style={{ color: 'var(--foreground)' }}>
+                  {conn.name}
+                </div>
+                <div
+                  className="text-xs truncate max-w-[200px]"
+                  style={{ color: 'var(--muted)' }}
+                >
                   {conn.url}
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-xs text-gray-400">{statusText(conn.status)}</div>
-              {conn.last_ping && (
-                <div className="text-xs text-gray-600">
-                  {new Date(conn.last_ping).toLocaleTimeString()}
-                </div>
-              )}
+            <div className="flex items-center gap-3">
+              {/* Terminal button */}
+              <button
+                onClick={() => setActiveTerminal(conn)}
+                disabled={conn.status !== "connected"}
+                className="text-xs px-2 py-1 rounded bg-gray-800 text-green-400 hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Open terminal"
+              >
+                💻
+              </button>
+              <div className="text-right">
+                <div className="text-xs" style={{ color: 'var(--muted)' }}>{statusText(conn.status)}</div>
+                {conn.last_ping && (
+                  <div className="text-xs" style={{ color: 'var(--muted-alt)' }}>
+                    {new Date(conn.last_ping).toLocaleTimeString()}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
+      {/* Terminal Viewer Modal */}
+      {activeTerminal && (
+        <TerminalViewer
+          connectionId={activeTerminal.id}
+          connectionName={activeTerminal.name}
+          connectionUrl={activeTerminal.url}
+          onClose={() => setActiveTerminal(null)}
+        />
+      )}
+
       {connections.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8" style={{ color: 'var(--muted)' }}>
           <p className="text-3xl mb-2">🔗</p>
           <p className="text-sm">暂无配置的实例</p>
           <p className="text-xs mt-1">在设置页面添加 Claude Code 实例连接</p>
