@@ -20,6 +20,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -29,7 +30,33 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.svg" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
+      <body className={inter.className}>
+        {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                      console.log('SW registered: ', registration);
+                    },
+                    function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    }
+                  );
+                });
+              }
+            `,
+          }}
+        />
+      </body>
     </html>
   );
 }

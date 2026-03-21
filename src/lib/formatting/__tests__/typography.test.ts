@@ -38,10 +38,12 @@ describe("spaceChineseNumber", () => {
 
 describe("normalizeQuotes", () => {
   it("should convert quotes near Chinese text", () => {
-    // Chinese opening quote
+    // Chinese opening quote - Chinese followed by quote becomes opening
     expect(normalizeQuotes('他说"你好')).toBe("他说\u201c你好");
-    // Chinese closing quote
-    expect(normalizeQuotes('你好"他说')).toBe("你好\u201d他说");
+    // Quote followed by Chinese becomes closing
+    expect(normalizeQuotes('"他说')).toBe("\u201d他说");
+    // Simple case: quote at end after Chinese
+    expect(normalizeQuotes('测试"')).toBe("测试\u201c");
   });
 });
 

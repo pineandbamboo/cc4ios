@@ -9,69 +9,88 @@ test.describe("CEO Support App", () => {
     // Check that the page title is correct
     await expect(page).toHaveTitle(/CEO Support/);
 
-    // Check that navigation tabs are visible
-    await expect(page.locator("text=首页")).toBeVisible();
-    await expect(page.locator("text=消息")).toBeVisible();
-    await expect(page.locator("text=CEO支持")).toBeVisible();
-    await expect(page.locator("text=工具")).toBeVisible();
-    await expect(page.locator("text=我的")).toBeVisible();
+    // Wait for redirect to documents page
+    await page.waitForURL(/\/documents/, { timeout: 5000 });
+
+    // Check that navigation tabs are visible (new 5-tab navigation)
+    await expect(page.getByRole("button", { name: /文档/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /会议/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /人才/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /邮件/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /设置/ })).toBeVisible();
   });
 
   test("should switch between tabs", async ({ page }) => {
-    // Click on different tabs and verify content changes
-    await page.click("text=首页");
-    await expect(page.locator("text=欢迎使用")).toBeVisible();
+    // Wait for redirect to documents
+    await page.waitForURL(/\/documents/, { timeout: 5000 });
 
-    await page.click("text=消息");
-    await expect(page.locator("text=暂无新消息")).toBeVisible();
+    // Click on Meetings tab
+    await page.getByRole("button", { name: /会议/ }).click();
+    await expect(page).toHaveURL(/\/meetings/);
+    await expect(page.getByText("暂无会议任务")).toBeVisible();
 
-    await page.click("text=工具");
-    await expect(page.locator("text=AI 编辑工具")).toBeVisible();
+    // Click on Talent tab
+    await page.getByRole("button", { name: /人才/ }).click();
+    await expect(page).toHaveURL(/\/talent/);
+    await expect(page.getByText("暂无人才任务")).toBeVisible();
 
-    await page.click("text=我的");
-    await expect(page.locator("text=个人设置")).toBeVisible();
+    // Click on Email tab
+    await page.getByRole("button", { name: /邮件/ }).click();
+    await expect(page).toHaveURL(/\/email/);
+    await expect(page.getByText("暂无邮件任务")).toBeVisible();
+
+    // Click on Settings tab
+    await page.getByRole("button", { name: /设置/ }).click();
+    await expect(page).toHaveURL(/\/settings/);
+    await expect(page.getByRole("heading", { name: "Claude Code 实例连接" })).toBeVisible();
   });
 
-  test("should display voice input component", async ({ page }) => {
-    // Navigate to CEO Support tab
-    await page.click("text=CEO支持");
+  test("should display voice input button", async ({ page }) => {
+    // Wait for redirect to documents
+    await page.waitForURL(/\/documents/, { timeout: 5000 });
 
     // Check voice input button is visible
-    await expect(page.locator("text=点���开始录音")).toBeVisible();
+    await expect(page.getByRole("button", { name: /🎤/ }).first()).toBeVisible();
   });
 
-  test("should display document list", async ({ page }) => {
-    // Navigate to CEO Support tab
-    await page.click("text=CEO支持");
+  test("should display document list on documents page", async ({ page }) => {
+    // Wait for redirect to documents
+    await page.waitForURL(/\/documents/, { timeout: 5000 });
 
     // Check document list header
-    await expect(page.locator("text=文档列表")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "文档列表" }).first()).toBeVisible();
+  });
 
-    // Check for new document button
-    await expect(page.locator("text=+ 新建")).toBeVisible();
+  test("should display instance monitor on documents page", async ({ page }) => {
+    // Wait for redirect to documents
+    await page.waitForURL(/\/documents/, { timeout: 5000 });
+
+    // Check instance monitor section
+    await expect(page.getByRole("heading", { name: "实例监控" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "实例状态" })).toBeVisible();
   });
 });
 
-test.describe("Voice Input", () => {
-  test("should show unsupported message when Web Speech API not available", async ({
-    page,
-  }) => {
-    // Mock Web Speech API as unavailable
-    await page.addInitScript(() => {
-      // @ts-expect-error - mocking
-      window.SpeechRecognition = undefined;
-      // @ts-expect-error - mocking
-      window.webkitSpeechRecognition = undefined;
-    });
+test.describe("Settings", () => {
+  test("should display server connection settings", async ({ page }) => {
+    await page.goto("/settings");
 
-    await page.goto("/");
-    await page.click("text=CEO支持");
+    // Check settings page content
+    await expect(page.getByRole("heading", { name: "设置" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Claude Code 实例连接" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /\+ 添加/ })).toBeVisible();
+  });
 
-    // Click voice button
-    await page.click("text=点击开始录音");
+  test("should show add connection form", async ({ page }) => {
+    await page.goto("/settings");
 
-    // Should show unsupported message
-    await expect(page.locator("text=/不支持语音识别/")).toBeVisible();
+    // Click add button
+    await page.getByRole("button", { name: /\+ 添加/ }).click();
+
+    // Check form fields
+    await expect(page.getByText("连接名称")).toBeVisible();
+    await expect(page.getByText("服务器地址")).toBeVisible();
+    await expect(page.getByText("认证令牌")).toBeVisible();
   });
 });
 
@@ -93,5 +112,25 @@ test.describe("PWA", () => {
       "content",
       /width=device-width/
     );
+  });
+
+  test("should have service worker", async ({ page }) => {
+    await page.goto("/");
+
+    // Check service worker registration
+    const swRegistered = await page.evaluate(() => {
+      return navigator.serviceWorker.getRegistration().then((reg) => !!reg);
+    });
+    expect(swRegistered).toBe(true);
+  });
+});
+
+test.describe("Task Management", () => {
+  test("should display task cards with status", async ({ page }) => {
+    await page.goto("/documents");
+    await page.waitForURL(/\/documents/, { timeout: 5000 });
+
+    // The page should have the recording button
+    await expect(page.getByRole("button", { name: /🎤/ }).first()).toBeVisible();
   });
 });

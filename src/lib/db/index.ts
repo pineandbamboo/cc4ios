@@ -61,11 +61,38 @@ CREATE TABLE IF NOT EXISTS ai_edit_sessions (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tasks table
+CREATE TABLE IF NOT EXISTS tasks (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'in_progress',
+  priority TEXT DEFAULT 'P2',
+  category TEXT DEFAULT 'documents',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Server connections table
+CREATE TABLE IF NOT EXISTS server_connections (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  auth_token TEXT,
+  status TEXT DEFAULT 'disconnected',
+  last_ping TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
 CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status);
 CREATE INDEX IF NOT EXISTS idx_voice_recordings_document_id ON voice_recordings(document_id);
 CREATE INDEX IF NOT EXISTS idx_translations_document_id ON translations(document_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_category ON tasks(category);
+CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
 `;
 db.exec(schema);
 
